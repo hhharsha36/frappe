@@ -12,6 +12,9 @@ def setup_database():
 	root_conn.sql(f"DROP USER IF EXISTS {frappe.conf.db_name}")
 	root_conn.sql(f"CREATE DATABASE `{frappe.conf.db_name}`")
 	root_conn.sql(f"CREATE user {frappe.conf.db_name} password '{frappe.conf.db_password}'")
+	psql_version = root_conn.sql(f"SELECT VERSION()", as_dict=True)
+	if psql_version and psql_version[0].get("version", "PostgreSQL 14").split()[1] >= "15":
+		root_conn.sql(f"GRANT ALL ON SCHEMA public TO {frappe.conf.db_name}")
 	root_conn.sql("GRANT ALL PRIVILEGES ON DATABASE `{0}` TO {0}".format(frappe.conf.db_name))
 	root_conn.close()
 
